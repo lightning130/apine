@@ -55,9 +55,9 @@ spec:
         - name: storage
           hostPath:
             path: /app/wizdata
-        - name: tomezone
+        - name: timezone
           hostPath:
-            path: /usr/share/zoneinfo/Asia/Shanghai
+            path: /etc/localtime
 ---
 apiVersion: v1
 kind: Service
