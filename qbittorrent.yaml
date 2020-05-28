@@ -1,5 +1,5 @@
 ---
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
@@ -44,17 +44,17 @@ spec:
         - containerPort: 8080
         resources: {}
         volumeMounts:
-        - mountPath: /config
-          name: qbittorrent-config
-        - mountPath: /downloads
-          name: qbittorrent-downloads
+          - mountPath: /config
+            name: qbittorrent-config
+          - mountPath: /downloads
+            name: qbittorrent-downloads
       restartPolicy: Always
       nodeName: phicomm
       volumes:
-      - name:  qbittorrent-config
-        mountPath: /app/qbittorrent/appdata
-      - name:  qbittorrent-downloads
-        mountPath: /app/qbittorrent/downloads
+        - name:  qbittorrent-config
+          mountPath: /app/qbittorrent/appdata
+        - name:  qbittorrent-downloads
+          mountPath: /app/qbittorrent/downloads
 status: {}
 ---
 apiVersion: v1
