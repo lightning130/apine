@@ -45,11 +45,11 @@ spec:
         - containerPort: 9269
           name: wiz-sync
           protocol: UDP
-      volumeMounts:
-        - name: storage
-          mountPath: /wiz/storage
-        - name: timezone
-          mountPath: /etc/localtime
+        volumeMounts:
+          - name: storage
+            mountPath: /wiz/storage
+          - name: timezone
+            mountPath: /etc/localtime
     volumes:
       - name: storage
         hostPath:
