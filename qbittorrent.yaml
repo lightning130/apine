@@ -34,7 +34,7 @@ spec:
           value: "022"
         - name: WEBUI_PORT
           value: "8080"
-        image: linuxserver/qbittorrent
+        image: linuxserver/qbittorrent:latest
         imagePullPolicy: IfNotPresent
         name: qbittorrent
         ports:

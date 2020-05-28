@@ -16,7 +16,7 @@ spec:
         app: kvm-server
     spec: 
       containers: 
-      - image: lstcml/kms
+      - image: lstcml/kms:latest
         imagePullPolicy: IfNotPresent
         livenessProbe: 
           failureThreshold: 3
