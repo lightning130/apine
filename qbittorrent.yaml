@@ -45,6 +45,7 @@ spec:
         - mountPath: /downloads
           name: qbittorrent-claim1
       restartPolicy: Always
+      nodeName: phicomm
       volumes:
       - name: qbittorrent-claim0
         persistentVolumeClaim:
