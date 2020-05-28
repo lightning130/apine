@@ -48,13 +48,15 @@ spec:
             name: qbittorrent-config
           - mountPath: /downloads
             name: qbittorrent-downloads
-      restartPolicy: Always
       nodeName: phicomm
+      restartPolicy: Always
       volumes:
         - name:  qbittorrent-config
-          mountPath: /app/qbittorrent/appdata
+          hostPath:
+            path: /app/qbittorrent/appdata
         - name:  qbittorrent-downloads
-          mountPath: /app/qbittorrent/downloads
+          hostPath:
+            path: /app/qbittorrent/downloads
 status: {}
 ---
 apiVersion: v1
