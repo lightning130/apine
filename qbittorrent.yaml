@@ -70,6 +70,7 @@ metadata:
     io.kompose.service: qbittorrent
   name: qbittorrent
 spec:
+  type: NodePort
   ports:
   - name: "6881"
     port: 6881
