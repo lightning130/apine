@@ -45,48 +45,16 @@ spec:
         resources: {}
         volumeMounts:
         - mountPath: /config
-          name: qbittorrent-claim0
+          name: qbittorrent-config
         - mountPath: /downloads
-          name: qbittorrent-claim1
+          name: qbittorrent-downloads
       restartPolicy: Always
       nodeName: phicomm
       volumes:
-      - name: qbittorrent-claim0
-        persistentVolumeClaim:
-          claimName: qbittorrent-claim0
-      - name: qbittorrent-claim1
-        persistentVolumeClaim:
-          claimName: qbittorrent-claim1
-status: {}
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  creationTimestamp: null
-  labels:
-    io.kompose.service: qbittorrent-claim0
-  name: qbittorrent-claim0
-spec:
-  accessModes:
-  - ReadWriteOnce
-  resources:
-    requests:
-      storage: 100Mi
-status: {}
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  creationTimestamp: null
-  labels:
-    io.kompose.service: qbittorrent-claim1
-  name: qbittorrent-claim1
-spec:
-  accessModes:
-  - ReadWriteOnce
-  resources:
-    requests:
-      storage: 100Mi
+      - name:  qbittorrent-config
+        mountPath: /app/qbittorrent/appdata
+      - name:  qbittorrent-downloads
+        mountPath: /app/qbittorrent/downloads
 status: {}
 ---
 apiVersion: v1
