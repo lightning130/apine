@@ -50,6 +50,7 @@ spec:
             mountPath: /wiz/storage
           - name: timezone
             mountPath: /etc/localtime
+      nodeName: k3s-node-002
       volumes:
         - name: storage
           hostPath:
