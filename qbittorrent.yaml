@@ -64,25 +64,19 @@ status: {}
 apiVersion: v1
 kind: Service
 metadata:
-  annotations:
-    kompose.cmd: kompose convert
-    kompose.version: 1.7.0 (HEAD)
-  labels:
-    io.kompose.service: qbittorrent
-    app: qbittorrent
   name: qbittorrent
 spec:
+  selector:
+    app: qbittorrent
   type: NodePort
   ports:
-  - name: "6881"
+  - name: "sync"
     port: 6881
     protocol: UDP
     targetPort: 6881
     nodePort: 30004
-  - name: "8080"
+  - name: "web-ui"
     port: 8080
     protocol: TCP
     targetPort: 8080
     nodePort: 30005
-  selector:
-    app: qbittorrent
