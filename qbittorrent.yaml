@@ -84,5 +84,6 @@ spec:
     nodePort: 30011
   selector:
     io.kompose.service: qbittorrent
+    name:  qbittorrent
 status:
   loadBalancer: {}
