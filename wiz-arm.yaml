@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: wiz
-        image: wiznote/wizserver
+        image: wiznote/wizserver:latest
         imagePullPolicy: IfNotPresent
         resources:
           limits:
