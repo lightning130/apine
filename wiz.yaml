@@ -1,0 +1,78 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wiz
+  namespace: service
+  labels:
+    app: wiz
+spec:
+  selector:
+    matchLabels:
+      app: wiz
+  template:
+    metadata:
+      labels:
+        app: wiz
+    spec:
+      containers:
+      - name: wiz
+        image: wiznote/wizserver
+        imagePullPolicy: IfNotPresent
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        livenessProbe: 
+          failureThreshold: 3
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          successThreshold: 1
+          tcpSocket:
+            port: 80
+          timeoutSeconds: 10
+        readinessProbe:
+            failureThreshold: 3
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            successThreshold: 1
+            tcpSocket:
+              port: 80
+            timeoutSeconds: 10
+        ports:
+        - containerPort: 80
+          name: wiz-ui
+          protocol: TCP
+        - containerPort: 9269
+          name: wiz-sync
+          protocol: UDP
+      volumeMounts:
+        - name: storage
+          mountPath: /wiz/storage
+        - name: timezone
+          mountPath: /etc/localtime
+    volumes:
+      - name: storage
+        hostPath:
+          path: /app/wizdata
+      - name: tomezone
+        hostPath:
+          path: /etc/localtime
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name:  wiz-svc
+spec:
+  selector:
+    app:  wiz
+  type:  NodePort
+  ports:
+  - name:  wiz-web
+    port:  80
+    targetPort:  80
+    protocol: TCP
+    nodePort: 30002
+  - name: wiz-sync
+    port: 9269
+    protocol: UDP
+    nodePort: 30003
