@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: wiz
-  namespace: service
+  namespace: home-service
   labels:
     app: wiz
 spec:
@@ -20,8 +20,8 @@ spec:
         imagePullPolicy: IfNotPresent
         resources:
           limits:
-            memory: "256Mi"
-            cpu: "500m"
+            memory: "1024Mi"
+            cpu: "1000m"
         livenessProbe: 
           failureThreshold: 3
           initialDelaySeconds: 30
@@ -60,6 +60,7 @@ spec:
 ---
 apiVersion: v1
 kind: Service
+namespace: home-service
 metadata:
   name:  wiz-svc
 spec:

@@ -5,7 +5,7 @@ metadata:
   labels: 
     app: kvm-server
   name: kvm-server
-  namespace: service
+  namespace: home-service
 spec: 
   selector: 
     matchLabels: 
@@ -46,7 +46,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: kvm-svc
-  namespace: service
+  namespace: home-service
 spec:
   type: NodePort
   selector:
