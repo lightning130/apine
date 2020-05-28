@@ -50,13 +50,14 @@ spec:
             mountPath: /wiz/storage
           - name: timezone
             mountPath: /etc/localtime
+            readOnly: true
       volumes:
         - name: storage
           hostPath:
             path: /app/wizdata
         - name: tomezone
           hostPath:
-            path: /etc/localtime
+            path: /usr/share/zoneinfo/Asia/Shanghai
 ---
 apiVersion: v1
 kind: Service
