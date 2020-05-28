@@ -50,13 +50,13 @@ spec:
             mountPath: /wiz/storage
           - name: timezone
             mountPath: /etc/localtime
-    volumes:
-      - name: storage
-        hostPath:
-          path: /app/wizdata
-      - name: tomezone
-        hostPath:
-          path: /etc/localtime
+      volumes:
+        - name: storage
+          hostPath:
+            path: /app/wizdata
+        - name: tomezone
+          hostPath:
+            path: /etc/localtime
 ---
 apiVersion: v1
 kind: Service
