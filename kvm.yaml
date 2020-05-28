@@ -1,0 +1,58 @@
+--- 
+apiVersion: apps/v1
+kind: Deployment
+metadata: 
+  labels: 
+    app: kvm-server
+  name: kvm-server
+  namespace: service
+spec: 
+  selector: 
+    matchLabels: 
+      app: kvm-server
+  template: 
+    metadata: 
+      labels: 
+        app: kvm-server
+    spec: 
+      containers: 
+      - image: lstcml/kms
+        imagePullPolicy: IfNotPresent
+        livenessProbe: 
+          failureThreshold: 3
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          successThreshold: 1
+          tcpSocket: 
+            port: 1688
+          timeoutSeconds: 10
+        name: kvm-server
+        ports: 
+          - containerPort: 1688
+        resources: 
+          limits: 
+            cpu: 500m
+            memory: 128Mi
+        volumeMounts: 
+          - name: timezone
+            mountPath: /etc/localtime
+            readOnly: true
+      volumes: 
+        - name: timezone
+          hostPath: 
+            path: /etc/localtime
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kvm-svc
+  namespace: service
+spec:
+  type: NodePort
+  selector:
+    app: kvm-server
+  ports:
+    - port: 1688
+      protocol: TCP
+      targetPort: 1688
+      nodePort: 30001
