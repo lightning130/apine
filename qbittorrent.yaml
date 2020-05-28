@@ -75,10 +75,12 @@ spec:
     port: 6881
     protocol: UDP
     targetPort: 6881
+    nodePort: 30010
   - name: "8080"
     port: 8080
     protocol: TCP
     targetPort: 8080
+    nodePort: 30011
   selector:
     io.kompose.service: qbittorrent
 status:
