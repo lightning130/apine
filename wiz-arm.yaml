@@ -16,11 +16,11 @@ spec:
     spec:
       containers:
       - name: wiz
-        image: wiznote/wizserver:latest
+        image: wiznote/wizserver-arm64:latest
         imagePullPolicy: IfNotPresent
         resources:
           limits:
-            memory: "128Mi"
+            memory: "256Mi"
             cpu: "500m"
         livenessProbe: 
           failureThreshold: 3
@@ -63,6 +63,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name:  wiz-svc
+  namespace: service
 spec:
   selector:
     app:  wiz
