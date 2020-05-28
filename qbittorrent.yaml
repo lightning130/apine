@@ -48,7 +48,7 @@ spec:
             name: qbittorrent-config
           - mountPath: /downloads
             name: qbittorrent-downloads
-      nodeName: phicomm
+      nodeName: k3s-node-002
       restartPolicy: Always
       volumes:
         - name:  qbittorrent-config
