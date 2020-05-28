@@ -1,20 +1,112 @@
 ---
-version: "2.1"
-services:
-  qbittorrent:
-    image: linuxserver/qbittorrent
-    container_name: qbittorrent
-    environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=Asia/Shanghai
-      - UMASK_SET=022
-      - WEBUI_PORT=8080
-    volumes:
-      - /app/qbittorrent/appdata/config:/config
-      - /app/qbittorrent/downloads:/downloads
-    ports:
-      - 6881:6881
-      - 6881:6881/udp
-      - 8080:8080
-    restart: unless-stopped
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.7.0 (HEAD)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: qbittorrent
+  name: qbittorrent
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        io.kompose.service: qbittorrent
+    spec:
+      containers:
+      - env:
+        - name: PGID
+          value: "1000"
+        - name: PUID
+          value: "1000"
+        - name: TZ
+          value: Asia/Shanghai
+        - name: UMASK_SET
+          value: "022"
+        - name: WEBUI_PORT
+          value: "8080"
+        image: linuxserver/qbittorrent
+        name: qbittorrent
+        ports:
+        - containerPort: 6881
+        - containerPort: 6881
+          protocol: UDP
+        - containerPort: 8080
+        resources: {}
+        volumeMounts:
+        - mountPath: /config
+          name: qbittorrent-claim0
+        - mountPath: /downloads
+          name: qbittorrent-claim1
+      restartPolicy: Always
+      volumes:
+      - name: qbittorrent-claim0
+        persistentVolumeClaim:
+          claimName: qbittorrent-claim0
+      - name: qbittorrent-claim1
+        persistentVolumeClaim:
+          claimName: qbittorrent-claim1
+status: {}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  creationTimestamp: null
+  labels:
+    io.kompose.service: qbittorrent-claim0
+  name: qbittorrent-claim0
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Mi
+status: {}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  creationTimestamp: null
+  labels:
+    io.kompose.service: qbittorrent-claim1
+  name: qbittorrent-claim1
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Mi
+status: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.7.0 (HEAD)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: qbittorrent
+  name: qbittorrent
+spec:
+  ports:
+  - name: "6881"
+    port: 6881
+    targetPort: 6881
+  - name: "6881"
+    port: 6881
+    protocol: UDP
+    targetPort: 6881
+  - name: "8080"
+    port: 8080
+    targetPort: 8080
+  selector:
+    io.kompose.service: qbittorrent
+status:
+  loadBalancer: {}
