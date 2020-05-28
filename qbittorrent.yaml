@@ -8,6 +8,7 @@ metadata:
   creationTimestamp: null
   labels:
     io.kompose.service: qbittorrent
+    app: qbittorrent
   name: qbittorrent
 spec:
   replicas: 1
@@ -21,6 +22,7 @@ spec:
       creationTimestamp: null
       labels:
         io.kompose.service: qbittorrent
+        app: qbittorrent
     spec:
       containers:
       - env:
@@ -65,9 +67,9 @@ metadata:
   annotations:
     kompose.cmd: kompose convert
     kompose.version: 1.7.0 (HEAD)
-  creationTimestamp: null
   labels:
     io.kompose.service: qbittorrent
+    app: qbittorrent
   name: qbittorrent
 spec:
   type: NodePort
@@ -85,3 +87,4 @@ spec:
   selector:
     io.kompose.service: qbittorrent
     name:  qbittorrent
+    app: qbittorrent
