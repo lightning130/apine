@@ -27,10 +27,21 @@ spec:
         volumeMounts:
           - name: timezone
             mountPath: /etc/localtime
+          - name: config
+            mountPath: /etc/nginx/conf.d
+          - name: ssl
+            mountPath: /etc/nginx/ssl
+
       volumes:
         - name: timezone
           hostPath:
               path: /etc/localtime
+        - name: config
+          hostPath:
+              path: /app/nginx/config
+        - name: ssl
+          hostPath:
+              path: /app/nginx/ssl
 ---
 apiVersion: v1
 kind: Service
