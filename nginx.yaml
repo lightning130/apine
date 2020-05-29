@@ -31,7 +31,7 @@ spec:
             mountPath: /etc/nginx/conf.d
           - name: ssl
             mountPath: /etc/nginx/ssl
-
+      nodeName: k3s-node-001
       volumes:
         - name: timezone
           hostPath:
