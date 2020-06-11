@@ -1,0 +1,95 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name:  jumpserver
+  namespace: service
+spec:
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app: jumpserver
+  template:
+    metadata:
+      labels:
+        app:  jumpserver
+    spec:
+      containers:
+      - image:  reg.docker-io.com/server/jms_all:latest
+        imagePullPolicy: Always
+        name:  jumpserver
+        resources:
+          limits:
+            memory: "1024Mi"
+            cpu: "2000m"
+        env:
+        - name:  SECRET_KEY
+          value:  TDnG8BlPCLHPfOcmZbzoZFEZw2Jlh2iSBb8t2N7aVlf9A3uNEe     
+        - name: BOOTSTRAP_TOKEN
+          value: YRCpj1ioYmqDkkiQ
+        - name: DB_HOST
+          value: jumpserverdb-svc.service.svc.cluster.local
+        - name: DB_PORT
+          value: "3306"
+        - name: DB_USER
+          value: jumpserver
+        - name: DB_PASSWORD
+          value: SEC71shzh
+        - name: DB_NAME
+          value: jumpserver
+        - name: REDIS_HOST
+          value: jumpredis-svc.service.svc.cluster.local
+        - name: REDIS_PORT
+          value: "6379"
+        - name: REDIS_PASSWORD
+          value: "129508"
+        ports:
+        - containerPort: 8080
+          name:  jumpweb
+          protocol: TCP
+        - containerPort: 2222
+          name: jumpssh
+          protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: jumpserver-svc
+  labels:
+    app: jumpserver-svc
+  namespace: service
+spec:
+  ports:
+  - name:  jumpserver-svc
+    port: 80
+    protocol: TCP
+    targetPort: 80
+  - name: jumpserver-ssh
+    port: 2222
+    protocol: TCP
+    targetPort: 2222
+  selector:
+    app: jumpserver
+  type: ClusterIP
+status:
+  loadBalancer: {}
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name:  jump-web-ui
+  namespace: service
+  labels:
+    app: jumpserver
+spec:
+  rules:
+  - host: jump.docker-io.com
+    http:
+      paths:
+      - backend:
+          serviceName: jumpserver-svc
+          servicePort: 80
+        path: /

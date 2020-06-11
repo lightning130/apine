@@ -24,6 +24,11 @@ spec:
             cpu: "500m"
         ports:
         - containerPort: 80
+        securityContext:
+          runAsUser: 1000
+          runAsGroup: 1000
+          allowPrivilegeEscalation: false
+          fsGroupChangePolicy: "OnRootMismatch"
         volumeMounts:
           - name: timezone
             mountPath: /etc/localtime
@@ -39,9 +44,11 @@ spec:
         - name: config
           hostPath:
               path: /app/nginx/config
+              type: DirectoryOrCreate
         - name: ssl
           hostPath:
               path: /app/nginx/ssl
+              type: DirectoryOrCreate
 ---
 apiVersion: v1
 kind: Service

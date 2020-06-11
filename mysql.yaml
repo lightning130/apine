@@ -1,0 +1,91 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jumpserverdb
+  namespace: service
+spec:
+  selector:
+    matchLabels:
+      app: jumpserverdb
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: jumpserverdb
+    spec:
+      containers:
+      - name: jumpserverdb
+        image: reg.docker-io.com/server/mysql-5.7-utf8
+        imagePullPolicy: Always
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          value: SEC71sh
+        resources:
+          limits:
+            memory: "1024Mi"
+            cpu: "2000m"
+        ports:
+        - containerPort: 3306
+          name: jumpserverdb
+          protocol: TCP
+        livenessProbe: 
+          failureThreshold: 3
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          successThreshold: 1
+          tcpSocket:
+            port: 3306
+          timeoutSeconds: 10
+        readinessProbe:
+            failureThreshold: 3
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            successThreshold: 1
+            tcpSocket:
+              port: 3306
+            timeoutSeconds: 10
+        volumeMounts:
+          - mountPath: /var/lib/mysql
+            name: jumpserverdb-data
+          - name: timezone
+            mountPath: /etc/localtime
+            readOnly: true
+      volumes:
+        - name: jumpserverdb-data
+          persistentVolumeClaim:
+              claimName: jumpserverdb-data
+        - name: timezone
+          hostPath:
+            path: /etc/localtime
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: jumpserverdb-data
+  labels:
+    name:  jumpserverdb-data
+  namespace: service
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Gi
+  storageClassName: nfs-client
+  volumeMode: Filesystem
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name:  jumpserverdb-svc
+  namespace: service
+spec:
+  selector:
+    app:  jumpserverdb
+  type:  ClusterIP
+  ports:
+  - name:  jumpserverdb-svc
+    port:  3306
+    protocol: TCP
+    targetPort:  3306

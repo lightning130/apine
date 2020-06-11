@@ -1,82 +1,126 @@
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  annotations:
-    kompose.cmd: kompose convert
-    kompose.version: 1.7.0 (HEAD)
-  creationTimestamp: null
-  labels:
-    io.kompose.service: qbittorrent
-    app: qbittorrent
   name: qbittorrent
+  namespace: home-service
+  labels:
+    app: qbittorrent
 spec:
-  replicas: 1
   selector:
     matchLabels:
-      io.kompose.service: qbittorrent
-  strategy:
-    type: Recreate
+      app: qbittorrent
   template:
     metadata:
-      creationTimestamp: null
       labels:
-        io.kompose.service: qbittorrent
         app: qbittorrent
     spec:
       containers:
-      - env:
+      - name: qbittorrent
+        image: linuxserver/qbittorrent:latest
+        imagePullPolicy: IfNotPresent
+        env:
         - name: PGID
           value: "1000"
         - name: PUID
           value: "1000"
         - name: TZ
-          value: Asia/Shanghai
+          value: "Asia/Shanghai"
         - name: UMASK_SET
           value: "022"
         - name: WEBUI_PORT
           value: "8080"
-        image: linuxserver/qbittorrent:latest
-        imagePullPolicy: IfNotPresent
-        name: qbittorrent
+        resources:
+          limits:
+            memory: "1024Mi"
+            cpu: "1000m"
+        livenessProbe: 
+          failureThreshold: 3
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          successThreshold: 1
+          tcpSocket:
+            port: 8080
+          timeoutSeconds: 10
+        readinessProbe:
+            failureThreshold: 3
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            successThreshold: 1
+            tcpSocket:
+              port: 8080
+            timeoutSeconds: 10
         ports:
-        - containerPort: 6881
-        - containerPort: 6881
-          protocol: UDP
         - containerPort: 8080
-        resources: {}
+          name: qbittorrent-wbe
+          protocol: TCP
+        - containerPort: 6188
+          name: qbit-sync-udp
+          protocol: UDP
+        - containerPort: 6188
+          name: qbit-sync-tcp
+          protocol: TCP
         volumeMounts:
-          - mountPath: /config
-            name: qbittorrent-config
-          - mountPath: /downloads
-            name: qbittorrent-downloads
-      nodeName: k3s-node-002
-      restartPolicy: Always
+          - name: qbittorrent-config
+            mountPath:  /config
+          - name: qbittorrent-downloads
+            mountPath: /downloads
+        securityContext:
+          privileged: true
+      nodeName: k3s-node-001
       volumes:
-        - name:  qbittorrent-config
+        - name: qbittorrent-config
           hostPath:
             path: /app/qbittorrent/appdata
-        - name:  qbittorrent-downloads
+            type: DirectoryOrCreate
+        - name: qbittorrent-downloads
           hostPath:
             path: /app/qbittorrent/downloads
-status: {}
+            type: DirectoryOrCreate
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: qbittorrent
-spec:
-  selector:
+  name: qbit-svc
+  labels:
     app: qbittorrent
-  type: NodePort
+  namespace: home-service
+spec:
   ports:
-  - name: "sync"
-    port: 6881
-    protocol: UDP
-    targetPort: 6881
-    nodePort: 30004
-  - name: "web-ui"
+  - name:  qbit-web-ui
     port: 8080
     protocol: TCP
     targetPort: 8080
-    nodePort: 30005
+  - name:  qbit-sync-udp
+    port: 6881
+    protocol: UDP
+    targetPort: 6881
+  - name: qbit-sync-tcp
+    port: 6881
+    protocol: TCP
+    targetPort: 6881
+  selector:
+    app: qbittorrent
+  type: ClusterIP
+status:
+  loadBalancer: {}
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name:  qbit-web-ui
+  namespace: home-service
+  labels:
+    app: qbittorrent
+spec:
+  rules:
+  - host: qbit.iosa.vip
+    http:
+      paths:
+      - backend:
+          serviceName: qbit-svc
+          servicePort: 8080
+        path: /
+status:
+  loadBalancer:
+    ingress:
+    - ip: 10.168.10.101

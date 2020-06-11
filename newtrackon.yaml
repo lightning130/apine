@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: newtrackon
+  labels:
+    app: newtrackon
+spec:
+  selector:
+    matchLabels:
+      app: newtrackon
+  template:
+    metadata:
+      labels:
+        app: newtrackon
+    spec:
+      containers:
+      - name: newtrackon
+        image: corralpeltzer/newtrackon
+        imagePullPolicy: IfNotPresent
+        resources:
+            limits:
+              cpu: "512m"
+              memory: "256Mi"
+        livenessProbe:
+           failureThreshold: 3
+           initialDelaySeconds: 30
+           periodSeconds: 10
+           successThreshold: 1
+           tcpSocket:
+             port: 8080
+           timeoutSeconds: 10
+        readinessProbe:
+           failureThreshold: 3
+           initialDelaySeconds: 30
+           periodSeconds: 10
+           successThreshold: 1
+           tcpSocket:
+             port: 8080
+           timeoutSeconds: 10
+        ports:
+          - containerPort: 8080
+            name: newtrackon-web
+            protocol: TCP
+        args:
+          - --address=0.0.0.0
+          - --ignore-ipv4
+          - --ignore-ipv6
+      nodeName: k3s-node-002

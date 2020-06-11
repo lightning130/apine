@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jumpredis
+  namespace: service
+spec:
+  selector:
+    matchLabels:
+      app: jumpredis
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: jumpredis
+    spec:
+      containers:
+      - name: jumpredis
+        image: reg.docker-io.com/server/redis-pwd
+        imagePullPolicy: Always
+        resources:
+          limits:
+            memory: "1024Mi"
+            cpu: "1000m"
+        ports:
+        - containerPort: 6379
+          name: jumpredis
+          protocol: TCP
+        livenessProbe: 
+          failureThreshold: 3
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          successThreshold: 1
+          tcpSocket:
+            port: 6379
+          timeoutSeconds: 10
+        readinessProbe:
+            failureThreshold: 3
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            successThreshold: 1
+            tcpSocket:
+              port: 6379
+            timeoutSeconds: 10
+        volumeMounts:
+          - name: timezone
+            mountPath: /etc/localtime
+            readOnly: true
+      volumes:
+        - name: timezone
+          hostPath:
+            path: /etc/localtime
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name:  jumpredis-svc
+  namespace: service
+spec:
+  selector:
+    app:  jumpredis
+  type:  ClusterIP
+  ports:
+  - name:  jumpredis-svc
+    port:  6379
+    protocol: TCP
+    targetPort:  6379
