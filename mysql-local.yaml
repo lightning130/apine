@@ -1,0 +1,76 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysqlsvc
+  namespace: home-service
+spec:
+  selector:
+    matchLabels:
+      app: mysqlsvc
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: mysqlsvc
+    spec:
+      containers:
+      - name: mysqlsvc
+        image: reg.docker-io.com/service/mysql-5.7
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          value: SEC71sh
+        resources:
+          limits:
+            memory: "2048Mi"
+            cpu: "2000m"
+        ports:
+        - containerPort: 3306
+          name: mysqlsvc
+          protocol: TCP
+        livenessProbe: 
+          failureThreshold: 3
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          successThreshold: 1
+          tcpSocket:
+            port: 3306
+          timeoutSeconds: 10
+        readinessProbe:
+            failureThreshold: 3
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            successThreshold: 1
+            tcpSocket:
+              port: 3306
+            timeoutSeconds: 10
+        volumeMounts:
+          - mountPath: /var/lib/mysql
+            name: mysqlsvc-data
+          - name: timezone
+            mountPath: /etc/localtime
+            readOnly: true
+      nodeName: k3s-node-001
+      volumes:
+        - name: mysqlsvc-data
+          hostPath:
+              path: /app/mysql-data
+        - name: timezone
+          hostPath:
+            path: /etc/localtime
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name:  mysqlsvc-svc
+  namespace: home-service
+spec:
+  selector:
+    app:  mysqlsvc
+  type:  ClusterIP
+  ports:
+  - name:  mysqlsvc-svc
+    port:  3306
+    protocol: TCP
+    targetPort:  3306

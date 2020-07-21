@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: icloudpd
+  namespace: home-service
+  labels:
+    app: icloudpd
+spec:
+  selector:
+    matchLabels:
+      app: icloudpd
+  template:
+    metadata:
+      labels:
+        app: icloudpd
+    spec:
+      containers:
+      - name: icloudpd
+        env:
+        - name: username
+          value: "testuser@example.com"
+        - name: password
+          value: "xxx"
+        - name: size
+          value: original
+        - name: recent
+          value: "500"
+        image: ndbroadbent/icloudpd
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        volumeMounts:
+          - name: storage
+            mountPath: /data
+          - name: timezone
+            mountPath: /etc/localtime
+      nodeName: k3s-node-002
+      volumes:
+        - name: storage
+          hostPath:
+            path: /app/Photos-backup
+
+---
+docker run -it --rm --name icloud -v $(pwd)/Photos:/data ndbroadbent/icloudpd:latest \
+    icloudpd /data \
+    --username testuser@example.com \
+    --password pass1234 \
+    --size original \
+    --recent 500 \
+    --auto-delete
