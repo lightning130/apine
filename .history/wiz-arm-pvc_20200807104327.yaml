@@ -46,31 +46,19 @@ spec:
           name: wiz-sync
           protocol: UDP
         volumeMounts:
-          - name: wiz-pvc-storage
+          - name: storage
             mountPath: /wiz/storage
           - name: timezone
             mountPath: /etc/localtime
             readOnly: true
+      nodeName: k3s-node-002
       volumes:
-        - name: wiz-pvc-storage
-          persistentVolumeClaim:
-              claimName: wiz-storage
+        - name: storage
+          hostPath:
+            path: /app/wizdata
         - name: timezone
           hostPath:
             path: /etc/localtime
----
-kind: PersistentVolumeClaim
-apiVersion: v1
-metadata:
-  name: wiz-storage
-spec:
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 50Gi
-  storageClassName: nfs-client
-  volumeMode: Filesystem
 ---
 apiVersion: v1
 kind: Service
